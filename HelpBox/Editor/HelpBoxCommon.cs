@@ -132,12 +132,15 @@ namespace OdinExtra.Editor.HelpBox
 
 			EditorGUILayout.BeginVertical();
 
-			GUILayout.Label(message, MessageStyle);
+			var rect = GUILayoutUtility.GetRect(GUIHelper.TempContent(message), MessageStyle);
+			EditorGUI.SelectableLabel(rect, message, MessageStyle);
 
 			if (SirenixEditorGUI.BeginFadeGroup(key, isVisible.Value))
 			{
 				SirenixEditorGUI.HorizontalLineSeparator(Color.black * 0.25f);
-				GUILayout.Label(detailMessage, MessageStyle);
+				
+				var rectDetails = GUILayoutUtility.GetRect(GUIHelper.TempContent(detailMessage), MessageStyle);
+				EditorGUI.SelectableLabel(rectDetails, detailMessage, MessageStyle);
 			}
 
 			SirenixEditorGUI.EndFadeGroup();
