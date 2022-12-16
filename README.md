@@ -1,6 +1,8 @@
 # OdinHelpBox
 Set of scripts that change how tooltips are drawn when using Odin Inspector and add new attribute for drawing compact help boxes.
 
+When folded, the tooltip is displayed by hovering over a toggle button.
+
 If you don't want to change how tooltips are drawn, remove `TooltipDetailsAttribute.cs` and `HelpBoxTooltipDrawer.cs`.
 
 If you don't want HelpBox attribute, remove `HelpBoxAttribute.cs` and `HelpBoxAttributeDrawer.cs`.
