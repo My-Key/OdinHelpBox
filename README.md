@@ -7,6 +7,10 @@ If you don't want to change how tooltips are drawn, remove `TooltipDetailsAttrib
 
 If you don't want HelpBox attribute, remove `HelpBoxAttribute.cs` and `HelpBoxAttributeDrawer.cs`.
 
+Supports [Rich Text](https://docs.unity3d.com/Packages/com.unity.ugui@1.0/manual/StyledText.html)
+
+Supports clickable links, for example `<a href=\"https://www.google.com/\">Google</a>`
+
 To add details to tooltip, add `TooltipDetails` attribute.
 
 ![Example](Images/Example.PNG)
