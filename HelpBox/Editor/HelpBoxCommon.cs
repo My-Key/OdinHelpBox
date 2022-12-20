@@ -1,4 +1,6 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using System.Text.RegularExpressions;
+using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -13,6 +15,8 @@ namespace OdinExtra.Editor.HelpBox
 		private static readonly Color TOGGLE_ON_COLOR = new Color(0.25f, 1.0f, 1.0f);
 
 		private static readonly Color BG_COLOR = new Color(0.5f, 1.0f, 1.0f);
+		
+		private static readonly Regex REMOVE_RICH_TEXT = new Regex("<.*?>", RegexOptions.Singleline);
 
 		public static bool ToggleButton(bool value, EditorIcon icon, Color toggleOnColor, Color toggleOffColor,
 			int width = 18, int height = 18, string tooltip = null)
@@ -62,19 +66,27 @@ namespace OdinExtra.Editor.HelpBox
 		public static bool BeginHelpBox(string tooltip, LocalPersistentContext<bool> isVisible, object fadeKey,
 			string detailed, LocalPersistentContext<bool> isVisibleDetailed, object fadeDetailedKey)
 		{
-			var buttonTooltip = isVisible.Value ? null : tooltip;
+			string buttonTooltip = null;
+			
+			if (!isVisible.Value) 
+				buttonTooltip = REMOVE_RICH_TEXT.Replace(tooltip, string.Empty);
 
 			var visible = isVisible.Value;
 
+			// if (EditorGUIUtility.hierarchyMode)
+			// 	GUIHelper.PushIndentLevel(EditorGUI.indentLevel - 1);
+			
 			GUIHelper.PushHierarchyMode(false);
-
+			
+			GUIHelper.PushLabelWidth(GUIHelper.BetterLabelWidth - 15f);
+			
 			SirenixEditorGUI.BeginIndentedHorizontal();
 
 			GUIHelper.PushGUIEnabled(true);
 
 			isVisible.Value = ToggleButton(isVisible.Value,
 				isVisible.Value ? SdfIconType.InfoCircleFill : SdfIconType.InfoCircle, TOGGLE_ON_COLOR, TOGGLE_ON_COLOR,
-				14, tooltip: buttonTooltip);
+				15, tooltip: buttonTooltip);
 			GUIHelper.PopGUIEnabled();
 
 			// if (visible)
@@ -83,7 +95,9 @@ namespace OdinExtra.Editor.HelpBox
 			SirenixEditorGUI.BeginIndentedVertical();
 
 			if (SirenixEditorGUI.BeginFadeGroup(fadeKey, isVisible.Value))
+			{
 				MessageBox(tooltip, detailed, isVisibleDetailed, fadeDetailedKey);
+			}
 
 			SirenixEditorGUI.EndFadeGroup();
 
@@ -95,8 +109,13 @@ namespace OdinExtra.Editor.HelpBox
 			SirenixEditorGUI.EndIndentedVertical();
 
 			SirenixEditorGUI.EndIndentedHorizontal();
+			
+			GUIHelper.PopLabelWidth();
 
 			GUIHelper.PopHierarchyMode();
+			
+			// if (EditorGUIUtility.hierarchyMode)
+			// 	GUIHelper.PopIndentLevel();
 
 			// if (visible)
 			// 	SirenixEditorGUI.EndBox();
@@ -121,7 +140,7 @@ namespace OdinExtra.Editor.HelpBox
 			SirenixEditorGUI.BeginBox();
 			GUIHelper.PopColor();
 
-			EditorGUILayout.BeginHorizontal();
+			SirenixEditorGUI.BeginIndentedHorizontal();
 
 			if (detailMessageIsValid)
 			{
@@ -130,7 +149,7 @@ namespace OdinExtra.Editor.HelpBox
 					tooltip: isVisible.Value ? "Hide details" : "Show details");
 			}
 
-			EditorGUILayout.BeginVertical();
+			SirenixEditorGUI.BeginIndentedVertical();
 
 			var rect = GUILayoutUtility.GetRect(GUIHelper.TempContent(message), MessageStyle);
 			EditorGUI.SelectableLabel(rect, message, MessageStyle);
@@ -145,9 +164,9 @@ namespace OdinExtra.Editor.HelpBox
 
 			SirenixEditorGUI.EndFadeGroup();
 
-			EditorGUILayout.EndVertical();
+			SirenixEditorGUI.EndIndentedVertical();
 
-			EditorGUILayout.EndHorizontal();
+			SirenixEditorGUI.EndIndentedHorizontal();
 			SirenixEditorGUI.EndBox();
 		}
 	}
