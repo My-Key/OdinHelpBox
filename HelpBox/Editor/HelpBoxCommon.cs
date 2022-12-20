@@ -17,6 +17,9 @@ namespace OdinExtra.Editor.HelpBox
 		private static readonly Color BG_COLOR = new Color(0.5f, 1.0f, 1.0f);
 		
 		private static readonly Regex REMOVE_RICH_TEXT = new Regex("<.*?>", RegexOptions.Singleline);
+		
+		
+		private const float TOGGLE_BUTTON_WIDTH = 15f;
 
 		public static bool ToggleButton(bool value, EditorIcon icon, Color toggleOnColor, Color toggleOffColor,
 			int width = 18, int height = 18, string tooltip = null)
@@ -41,12 +44,8 @@ namespace OdinExtra.Editor.HelpBox
 			return current;
 		}
 
-		public static bool ToggleButton(bool value, SdfIconType icon, Color toggleOnColor, Color toggleOffColor,
-			int width = 18, int height = 18, string tooltip = null)
+		public static bool ToggleButton(Rect rect, bool value, SdfIconType icon, Color toggleOnColor, Color toggleOffColor, string tooltip = null)
 		{
-			var rect = EditorGUILayout.GetControlRect(false,
-				GUILayoutOptions.ExpandWidth(false).Width(width).Height(height));
-
 			var current = GUI.Toggle(rect, value, GUIHelper.TempContent(null, null, tooltip), GUIStyle.none);
 
 			if (current != value)
@@ -72,27 +71,38 @@ namespace OdinExtra.Editor.HelpBox
 				buttonTooltip = REMOVE_RICH_TEXT.Replace(tooltip, string.Empty);
 
 			var visible = isVisible.Value;
+			
+			EditorGUILayout.BeginHorizontal();
+			
+			var offset = TOGGLE_BUTTON_WIDTH;
+			var height = EditorGUIUtility.singleLineHeight;
 
-			// if (EditorGUIUtility.hierarchyMode)
-			// 	GUIHelper.PushIndentLevel(EditorGUI.indentLevel - 1);
-			
-			GUIHelper.PushHierarchyMode(false);
-			
-			GUIHelper.PushLabelWidth(GUIHelper.BetterLabelWidth - 15f);
-			
-			SirenixEditorGUI.BeginIndentedHorizontal();
+			if (EditorGUI.indentLevel == 0 && !EditorGUIUtility.hierarchyMode)
+			{
+				GUIHelper.PushIndentLevel(EditorGUI.indentLevel + 1);
+			}
+			else
+			{
+				GUIHelper.PushIndentLevel(EditorGUI.indentLevel);
+				offset = 0f;
+			}
 
 			GUIHelper.PushGUIEnabled(true);
+			
+			var toggleButtonRect = new Rect();
+			toggleButtonRect = GUIHelper.GetCurrentLayoutRect();
+			toggleButtonRect.xMin = GUIHelper.CurrentIndentAmount - offset;
+			toggleButtonRect.width = TOGGLE_BUTTON_WIDTH;
+			toggleButtonRect.height = height;
 
-			isVisible.Value = ToggleButton(isVisible.Value,
+			isVisible.Value = ToggleButton(toggleButtonRect, isVisible.Value,
 				isVisible.Value ? SdfIconType.InfoCircleFill : SdfIconType.InfoCircle, TOGGLE_ON_COLOR, TOGGLE_ON_COLOR,
-				15, tooltip: buttonTooltip);
+				tooltip: buttonTooltip);
 			GUIHelper.PopGUIEnabled();
+			
+			GUIHelper.PushHierarchyMode(false);
 
-			// if (visible)
-			// 	SirenixEditorGUI.BeginBox();
-
-			SirenixEditorGUI.BeginIndentedVertical();
+			EditorGUILayout.BeginVertical();
 
 			if (SirenixEditorGUI.BeginFadeGroup(fadeKey, isVisible.Value))
 			{
@@ -104,21 +114,15 @@ namespace OdinExtra.Editor.HelpBox
 			return visible;
 		}
 
-		public static void EndHelpBox(bool visible)
+		public static void EndHelpBox()
 		{
-			SirenixEditorGUI.EndIndentedVertical();
-
-			SirenixEditorGUI.EndIndentedHorizontal();
-			
-			GUIHelper.PopLabelWidth();
+			EditorGUILayout.EndVertical();
 
 			GUIHelper.PopHierarchyMode();
 			
-			// if (EditorGUIUtility.hierarchyMode)
-			// 	GUIHelper.PopIndentLevel();
+			GUIHelper.PopIndentLevel();
 
-			// if (visible)
-			// 	SirenixEditorGUI.EndBox();
+			EditorGUILayout.EndHorizontal();
 		}
 
 		private static GUIStyle MESSSAGE_BOX;
@@ -140,7 +144,7 @@ namespace OdinExtra.Editor.HelpBox
 			SirenixEditorGUI.BeginBox();
 			GUIHelper.PopColor();
 
-			SirenixEditorGUI.BeginIndentedHorizontal();
+			EditorGUILayout.BeginHorizontal();
 
 			if (detailMessageIsValid)
 			{
@@ -149,7 +153,7 @@ namespace OdinExtra.Editor.HelpBox
 					tooltip: isVisible.Value ? "Hide details" : "Show details");
 			}
 
-			SirenixEditorGUI.BeginIndentedVertical();
+			EditorGUILayout.BeginVertical();
 
 			var rect = GUILayoutUtility.GetRect(GUIHelper.TempContent(message), MessageStyle);
 			EditorGUI.SelectableLabel(rect, message, MessageStyle);
@@ -164,9 +168,9 @@ namespace OdinExtra.Editor.HelpBox
 
 			SirenixEditorGUI.EndFadeGroup();
 
-			SirenixEditorGUI.EndIndentedVertical();
+			EditorGUILayout.EndVertical();
 
-			SirenixEditorGUI.EndIndentedHorizontal();
+			EditorGUILayout.EndHorizontal();
 			SirenixEditorGUI.EndBox();
 		}
 	}
