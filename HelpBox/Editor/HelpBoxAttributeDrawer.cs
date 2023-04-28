@@ -49,7 +49,7 @@ namespace OdinExtra.Editor.HelpBox
 
 			CallNextDrawer(label);
 
-			HelpBoxCommon.EndHelpBox(visible);
+			HelpBoxCommon.EndHelpBox();
 		}
 	}
 }

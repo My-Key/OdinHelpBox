@@ -30,7 +30,7 @@ namespace OdinExtra.Editor.HelpBox
 
 		protected override void DrawPropertyLayout(GUIContent label)
 		{
-			var hasTooltip = label != null && !string.IsNullOrWhiteSpace(label.tooltip);
+			var hasTooltip = label != null && !string.IsNullOrEmpty(label.tooltip);
 
 			if (!hasTooltip)
 			{
@@ -54,7 +54,7 @@ namespace OdinExtra.Editor.HelpBox
 
 			CallNextDrawer(label);
 
-			HelpBoxCommon.EndHelpBox(visible);
+			HelpBoxCommon.EndHelpBox();
 		}
 	}
 }
